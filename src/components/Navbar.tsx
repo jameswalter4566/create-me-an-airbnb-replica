@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import SignInModal from './SignInModal';
+import { getPhantomProvider, shortenAddress } from '../lib/phantom';
 
 const navLinks = [
   { id: 'stays', label: 'Stays', href: '#stays' },
@@ -12,7 +14,11 @@ export default function Navbar() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [ctaHover, setCtaHover] = useState(false);
   const [searchHover, setSearchHover] = useState(false);
+  const [signInHover, setSignInHover] = useState(false);
+  const [accountHover, setAccountHover] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
+  const [account, setAccount] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -21,6 +27,46 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Restore a trusted Phantom session and keep the account in sync.
+  useEffect(() => {
+    const provider = getPhantomProvider();
+    if (!provider) return;
+
+    provider
+      .connect({ onlyIfTrusted: true })
+      .then(({ publicKey }) => setAccount(publicKey.toString()))
+      .catch(() => {
+        /* Not previously authorized — user must sign in manually. */
+      });
+
+    const handleAccountChanged = (publicKey: unknown) => {
+      if (publicKey && typeof (publicKey as { toString?: unknown }).toString === 'function') {
+        setAccount((publicKey as { toString(): string }).toString());
+      } else {
+        setAccount(null);
+      }
+    };
+    const handleDisconnect = () => setAccount(null);
+
+    provider.on('accountChanged', handleAccountChanged);
+    provider.on('disconnect', handleDisconnect);
+
+    return () => {
+      provider.removeListener('accountChanged', handleAccountChanged);
+      provider.removeListener('disconnect', handleDisconnect);
+    };
+  }, []);
+
+  const handleDisconnect = async () => {
+    const provider = getPhantomProvider();
+    try {
+      await provider?.disconnect();
+    } catch {
+      /* ignore */
+    }
+    setAccount(null);
+  };
 
   return (
     <nav
@@ -171,6 +217,63 @@ export default function Navbar() {
             Anywhere
           </button>
 
+          {account ? (
+            <button
+              type="button"
+              onClick={handleDisconnect}
+              onMouseEnter={() => setAccountHover(true)}
+              onMouseLeave={() => setAccountHover(false)}
+              title="Click to disconnect"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '9px',
+                padding: '9px 15px',
+                borderRadius: '999px',
+                border: '1px solid',
+                borderColor: accountHover ? 'rgba(124,92,255,0.6)' : 'rgba(124,92,255,0.35)',
+                background: accountHover ? 'rgba(124,92,255,0.16)' : 'rgba(124,92,255,0.08)',
+                color: '#e7e2ff',
+                fontSize: '13.5px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <span
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '999px',
+                  background: '#3ddc97',
+                  boxShadow: '0 0 8px rgba(61, 220, 151, 0.8)',
+                }}
+              />
+              {accountHover ? 'Disconnect' : shortenAddress(account)}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSignInOpen(true)}
+              onMouseEnter={() => setSignInHover(true)}
+              onMouseLeave={() => setSignInHover(false)}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '999px',
+                border: '1px solid',
+                borderColor: signInHover ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.14)',
+                background: signInHover ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
+                color: '#f6f4f2',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Sign in
+            </button>
+          )}
+
           <button
             type="button"
             onMouseEnter={() => setCtaHover(true)}
@@ -197,6 +300,15 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+
+      <SignInModal
+        open={signInOpen}
+        onClose={() => setSignInOpen(false)}
+        onSignedIn={(address) => {
+          setAccount(address);
+          setSignInOpen(false);
+        }}
+      />
 
       {menuOpen ? (
         <div
