@@ -87,7 +87,7 @@ export function usePhantom(): PhantomAuth {
       // Prove ownership by signing a human-readable, off-chain message.
       setStatus('signing');
       const message =
-        `Sign in to Nomadly\n\n` +
+        `Sign in to Airbnb\n\n` +
         `Wallet: ${walletAddress}\n` +
         `Issued: ${new Date().toISOString()}\n\n` +
         `Signing is free and will not trigger a blockchain transaction.`;

@@ -1,179 +1,46 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 const columns = [
   {
-    id: 'explore',
-    title: 'Explore',
-    links: ['Cabins & A-frames', 'City lofts', 'Beachfront', 'Monthly stays', 'Pet friendly'],
-  },
-  {
-    id: 'hosting',
-    title: 'Hosting',
-    links: ['List your home', 'Earnings calculator', 'Host protection', 'Scout program', 'Host community'],
-  },
-  {
-    id: 'support',
     title: 'Support',
-    links: ['Help center', 'Trip support', 'Cancellation options', 'Report a listing', 'Accessibility'],
+    links: ['Help Center', 'AirCover', 'Anti-discrimination', 'Disability support', 'Cancellation options', 'Report a concern'],
   },
   {
-    id: 'company',
-    title: 'Company',
-    links: ['About Nomadly', 'Newsroom', 'Careers', 'Investors', 'Sustainability'],
-  },
-];
-
-const socials = [
-  {
-    id: 'instagram',
-    name: 'Instagram',
-    path: 'M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm5 5.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zm5.6-1.1a1.1 1.1 0 110 2.2 1.1 1.1 0 010-2.2z',
+    title: 'Hosting',
+    links: ['Airbnb your home', 'AirCover for Hosts', 'Hosting resources', 'Community forum', 'Hosting responsibly', 'Join a free class'],
   },
   {
-    id: 'x',
-    name: 'X',
-    path: 'M3 3h5l4.5 6L17 3h4l-7 9.2L21.5 21H16l-4.7-6.4L6 21H2l7.4-9.6L3 3z',
-  },
-  {
-    id: 'youtube',
-    name: 'YouTube',
-    path: 'M22 12s0-3.2-.4-4.7a2.5 2.5 0 00-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.5A2.5 2.5 0 002.4 7.3C2 8.8 2 12 2 12s0 3.2.4 4.7a2.5 2.5 0 001.8 1.8C5.7 19 12 19 12 19s6.3 0 7.8-.5a2.5 2.5 0 001.8-1.8C22 15.2 22 12 22 12zM10 15V9l5 3-5 3z',
-  },
-  {
-    id: 'linkedin',
-    name: 'LinkedIn',
-    path: 'M4.5 3.5a2 2 0 110 4 2 2 0 010-4zM3 9h3v12H3V9zm6 0h3v1.7c.6-1 1.8-2 3.6-2 2.7 0 4.4 1.7 4.4 5V21h-3v-6.6c0-1.7-.7-2.6-2.1-2.6-1.2 0-2 .8-2.3 1.6-.1.3-.1.7-.1 1.1V21H9V9z',
+    title: 'Airbnb',
+    links: ['Newsroom', 'New features', 'Careers', 'Investors', 'Gift cards', 'Airbnb.org emergency stays'],
   },
 ];
 
 export default function Footer() {
-  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
-  const [hoveredSocial, setHoveredSocial] = useState<string | null>(null);
-  const year = new Date().getFullYear();
-
   return (
-    <footer
-      style={{
-        padding: '76px 24px 34px',
-        background: '#0b0a0d',
-        borderTop: '1px solid rgba(255,255,255,0.08)',
-      }}
-    >
-      <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+    <footer style={{ borderTop: '1px solid #ebebeb', background: '#f7f7f7', marginTop: '40px' }}>
+      <div className="container" style={{ paddingTop: '48px', paddingBottom: '24px' }}>
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-            gap: '44px',
-            marginBottom: '54px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '28px',
+            paddingBottom: '32px',
+            borderBottom: '1px solid #dddddd',
           }}
         >
-          <div style={{ gridColumn: 'span 1', minWidth: '220px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <span
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '11px',
-                  background: 'linear-gradient(135deg, #ff5a5f 0%, #c8375d 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 11l9-8 9 8" />
-                  <path d="M5 10v10h14V10" />
-                  <path d="M10 20v-6h4v6" />
-                </svg>
-              </span>
-              <span
-                style={{
-                  fontFamily: "'Fraunces', Georgia, serif",
-                  fontSize: '20px',
-                  fontWeight: 700,
-                  color: '#f6f4f2',
-                }}
-              >
-                Nomadly
-              </span>
-            </div>
-            <p style={{ fontSize: '14px', lineHeight: 1.7, color: '#a9a4b4', maxWidth: '270px' }}>
-              Independently inspected homes in 190 countries, hosted by people we have actually
-              met. Honest prices, keyless arrivals, humans on call.
-            </p>
-            <div style={{ display: 'flex', gap: '10px', marginTop: '22px' }}>
-              {socials.map((social) => {
-                const active = hoveredSocial === social.id;
-                return (
-                  <a
-                    key={social.id}
-                    href="#top"
-                    aria-label={social.name}
-                    onMouseEnter={() => setHoveredSocial(social.id)}
-                    onMouseLeave={() => setHoveredSocial(null)}
-                    style={{
-                      width: '38px',
-                      height: '38px',
-                      borderRadius: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1px solid',
-                      borderColor: active ? 'rgba(255,90,95,0.5)' : 'rgba(255,255,255,0.1)',
-                      background: active ? 'rgba(255,90,95,0.12)' : 'rgba(255,255,255,0.03)',
-                      color: active ? '#ff8a63' : '#a9a4b4',
-                      transform: active ? 'translateY(-3px)' : 'translateY(0)',
-                      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d={social.path} />
-                    </svg>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
-          {columns.map((column) => (
-            <div key={column.id}>
-              <div
-                style={{
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: '#ffffff',
-                  marginBottom: '18px',
-                }}
-              >
-                {column.title}
-              </div>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                {column.links.map((link) => {
-                  const key = `${column.id}-${link}`;
-                  const active = hoveredLink === key;
-                  return (
-                    <li key={key} style={{ marginBottom: '11px' }}>
-                      <a
-                        href="#top"
-                        onMouseEnter={() => setHoveredLink(key)}
-                        onMouseLeave={() => setHoveredLink(null)}
-                        style={{
-                          fontSize: '14px',
-                          textDecoration: 'none',
-                          color: active ? '#ffffff' : '#a9a4b4',
-                          paddingLeft: active ? '6px' : '0px',
-                          display: 'inline-block',
-                          transition: 'all 0.22s ease',
-                        }}
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  );
-                })}
+          {columns.map((col) => (
+            <div key={col.title}>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#222', marginBottom: '14px' }}>
+                {col.title}
+              </h3>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {col.links.map((link) => (
+                  <li key={link}>
+                    <a href="#footer" className="footer-link">
+                      {link}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           ))}
@@ -186,34 +53,51 @@ export default function Footer() {
             gap: '16px',
             alignItems: 'center',
             justifyContent: 'space-between',
-            paddingTop: '26px',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
+            paddingTop: '24px',
           }}
         >
-          <div style={{ fontSize: '13.5px', color: '#8f8a9c' }}>
-            © {year} Nomadly Travel Inc. · SITE · Crafted for people who unpack slowly.
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', fontSize: '14px', color: '#222' }}>
+            <span>© 2026 Airbnb, Inc.</span>
+            <span aria-hidden="true">·</span>
+            <a href="#footer" className="footer-link">Terms</a>
+            <span aria-hidden="true">·</span>
+            <a href="#footer" className="footer-link">Sitemap</a>
+            <span aria-hidden="true">·</span>
+            <a href="#footer" className="footer-link">Privacy</a>
+            <span aria-hidden="true">·</span>
+            <a href="#footer" className="footer-link">Your Privacy Choices</a>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '22px' }}>
-            {['Privacy', 'Terms', 'Sitemap', 'Cookie preferences'].map((item) => {
-              const key = `legal-${item}`;
-              const active = hoveredLink === key;
-              return (
-                <a
-                  key={key}
-                  href="#top"
-                  onMouseEnter={() => setHoveredLink(key)}
-                  onMouseLeave={() => setHoveredLink(null)}
-                  style={{
-                    fontSize: '13.5px',
-                    textDecoration: 'none',
-                    color: active ? '#ff8a63' : '#8f8a9c',
-                    transition: 'color 0.22s ease',
-                  }}
-                >
-                  {item}
-                </a>
-              );
-            })}
+
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center', fontSize: '14px', fontWeight: 700, color: '#222' }}>
+            <button type="button" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18" />
+              </svg>
+              English (US)
+            </button>
+            <button type="button" style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>
+              $ USD
+            </button>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <a href="#footer" aria-label="Facebook">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#222" aria-hidden="true">
+                  <path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H7v3h3v6h3v-6h3l1-3h-4v-2c0-.6.4-1 1-1z" />
+                </svg>
+              </a>
+              <a href="#footer" aria-label="Twitter">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#222" aria-hidden="true">
+                  <path d="M22 5.8c-.7.3-1.5.6-2.3.7.8-.5 1.4-1.3 1.7-2.2-.8.5-1.7.8-2.6 1a4 4 0 0 0-6.8 3.6A11.3 11.3 0 0 1 3.7 4.6a4 4 0 0 0 1.2 5.3c-.6 0-1.2-.2-1.8-.5v.1a4 4 0 0 0 3.2 3.9c-.6.2-1.2.2-1.8.1a4 4 0 0 0 3.7 2.8A8 8 0 0 1 2 18.1 11.3 11.3 0 0 0 8.1 20c7.3 0 11.4-6.1 11.4-11.4v-.5c.8-.6 1.5-1.3 2-2.2z" />
+                </svg>
+              </a>
+              <a href="#footer" aria-label="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="1" fill="#222" stroke="none" />
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       </div>

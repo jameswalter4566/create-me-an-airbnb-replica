@@ -4,20 +4,14 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ["'Fraunces'", 'Georgia', 'serif'],
-        sans: ["'Manrope'", 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ["'Mulish'", '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       colors: {
-        bg: '#0b0a0d',
-        'bg-elevated': '#131218',
-        card: '#17161d',
-        'card-hover': '#1e1c26',
-        fg: '#f6f4f2',
-        muted: '#a9a4b4',
-        accent: '#ff5a5f',
-        'accent-soft': '#ff8a63',
-        'accent-deep': '#c8375d',
-        teal: '#00a699',
+        rausch: '#ff385c',
+        'rausch-dark': '#e00b41',
+        fg: '#222222',
+        'fg-soft': '#6a6a6a',
+        line: '#dddddd',
       },
     },
   },

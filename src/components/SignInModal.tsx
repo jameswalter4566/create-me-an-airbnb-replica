@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { shortenAddress, PHANTOM_DOWNLOAD_URL } from '../lib/phantom';
 import type { PhantomStatus } from '../hooks/usePhantom';
@@ -21,20 +21,14 @@ export default function SignInModal({
   onClose,
   onConnect,
 }: SignInModalProps) {
-  const [closeHover, setCloseHover] = useState(false);
-  const [btnHover, setBtnHover] = useState(false);
-
-  // Lock body scroll + allow Escape to close while the modal is open.
   useEffect(() => {
     if (!open) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
-
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', onKeyDown);
@@ -55,15 +49,14 @@ export default function SignInModal({
       ? 'Signed in'
       : status === 'error'
       ? 'Try again'
-      : 'Connect Phantom';
+      : 'Continue with Phantom';
 
   const overlay = (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Sign in to Nomadly"
+      aria-label="Log in or sign up"
       onMouseDown={(e) => {
-        // Close only when the backdrop itself is clicked.
         if (e.target === e.currentTarget) onClose();
       }}
       style={{
@@ -74,9 +67,7 @@ export default function SignInModal({
         alignItems: 'center',
         justifyContent: 'center',
         padding: '24px',
-        background: 'rgba(6, 5, 8, 0.72)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        background: 'rgba(0, 0, 0, 0.5)',
         animation: 'fadeIn 0.2s ease both',
       }}
     >
@@ -84,194 +75,163 @@ export default function SignInModal({
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: '420px',
-          background: 'linear-gradient(180deg, #1a1822 0%, #131218 100%)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '24px',
-          padding: '34px 30px 30px',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.6)',
-          animation: 'slideUp 0.28s cubic-bezier(0.4, 0, 0.2, 1) both',
+          maxWidth: '568px',
+          background: '#fff',
+          borderRadius: '16px',
+          boxShadow: '0 8px 28px rgba(0,0,0,0.28)',
+          overflow: 'hidden',
+          animation: 'popIn 0.2s cubic-bezier(0.35,0,0.28,1) both',
         }}
       >
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
-          onMouseEnter={() => setCloseHover(true)}
-          onMouseLeave={() => setCloseHover(false)}
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            width: '34px',
-            height: '34px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '999px',
-            border: '1px solid rgba(255,255,255,0.12)',
-            background: closeHover ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.03)',
-            color: '#cbc6d6',
-            cursor: 'pointer',
-            transition: 'background 0.2s ease',
-          }}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-            <path d="M6 6l12 12M18 6L6 18" />
-          </svg>
-        </button>
-
+        {/* Header */}
         <div
           style={{
-            width: '54px',
-            height: '54px',
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, #ab9ff2 0%, #7c5cff 100%)',
+            position: 'relative',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '18px',
-            boxShadow: '0 0 28px rgba(124, 92, 255, 0.4)',
+            padding: '20px 24px',
+            borderBottom: '1px solid #ebebeb',
           }}
         >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="6" width="20" height="13" rx="3" />
-            <path d="M2 10h20" />
-            <circle cx="17" cy="14.5" r="1.4" fill="#ffffff" stroke="none" />
-          </svg>
-        </div>
-
-        <h2
-          style={{
-            fontSize: '25px',
-            fontWeight: 700,
-            color: '#f6f4f2',
-            marginBottom: '8px',
-          }}
-        >
-          Sign in to Nomadly
-        </h2>
-        <p
-          style={{
-            fontSize: '14.5px',
-            lineHeight: 1.55,
-            color: '#a9a4b4',
-            marginBottom: '24px',
-          }}
-        >
-          {busy
-            ? 'Approve the request in the Phantom popup to finish signing in.'
-            : 'Connect your Phantom wallet to book stays, manage trips and get paid as a host — no password required.'}
-        </p>
-
-        {done && account ? (
-          <div
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
             style={{
+              position: 'absolute',
+              left: '16px',
+              width: '32px',
+              height: '32px',
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              padding: '14px 16px',
-              borderRadius: '14px',
-              background: 'rgba(0, 166, 153, 0.12)',
-              border: '1px solid rgba(0, 166, 153, 0.4)',
-              marginBottom: '20px',
+              justifyContent: 'center',
+              borderRadius: '999px',
+              border: 'none',
+              background: 'transparent',
+              color: '#222',
+              cursor: 'pointer',
             }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3ddc97" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 6L9 17l-5-5" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+              <path d="M6 6l12 12M18 6L6 18" />
             </svg>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: '#d9fff2' }}>
-              Connected as {shortenAddress(account)}
-            </span>
-          </div>
-        ) : null}
+          </button>
+          <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#222' }}>Log in or sign up</h2>
+        </div>
 
-        {error ? (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '10px',
-              padding: '12px 14px',
-              borderRadius: '14px',
-              background: 'rgba(255, 90, 95, 0.1)',
-              border: '1px solid rgba(255, 90, 95, 0.4)',
-              marginBottom: '20px',
-            }}
-          >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ff8a8d" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '1px' }}>
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v5M12 16.5v.5" />
-            </svg>
-            <span style={{ fontSize: '13.5px', lineHeight: 1.5, color: '#ffc4c6' }}>{error}</span>
-          </div>
-        ) : null}
+        {/* Body */}
+        <div style={{ padding: '24px' }}>
+          <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#222', marginBottom: '22px' }}>
+            Welcome to Airbnb
+          </h3>
 
-        <button
-          type="button"
-          onClick={onConnect}
-          disabled={busy || done}
-          onMouseEnter={() => setBtnHover(true)}
-          onMouseLeave={() => setBtnHover(false)}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '10px',
-            padding: '15px 20px',
-            borderRadius: '14px',
-            border: 'none',
-            background:
-              busy || done
-                ? 'rgba(124, 92, 255, 0.5)'
-                : btnHover
-                ? 'linear-gradient(135deg, #b6a9ff 0%, #8b6dff 100%)'
-                : 'linear-gradient(135deg, #ab9ff2 0%, #7c5cff 100%)',
-            color: '#ffffff',
-            fontSize: '15.5px',
-            fontWeight: 700,
-            cursor: busy || done ? 'default' : 'pointer',
-            boxShadow: btnHover && !busy && !done ? '0 14px 30px rgba(124, 92, 255, 0.4)' : 'none',
-            transition: 'all 0.22s ease',
-          }}
-        >
-          {busy ? (
-            <span
+          {done && account ? (
+            <div
               style={{
-                width: '17px',
-                height: '17px',
-                borderRadius: '999px',
-                border: '2px solid rgba(255,255,255,0.4)',
-                borderTopColor: '#ffffff',
-                animation: 'spin 0.7s linear infinite',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '14px 16px',
+                borderRadius: '12px',
+                background: '#f0fbf4',
+                border: '1px solid #b7e4c7',
+                marginBottom: '18px',
               }}
-            />
-          ) : (
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="6" width="20" height="13" rx="3" />
-              <path d="M2 10h20" />
-            </svg>
-          )}
-          {buttonLabel}
-        </button>
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a7f43" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a7f43' }}>
+                Signed in as {shortenAddress(account)}
+              </span>
+            </div>
+          ) : null}
 
-        <a
-          href={PHANTOM_DOWNLOAD_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'block',
-            textAlign: 'center',
-            marginTop: '16px',
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#a9a4b4',
-            textDecoration: 'none',
-          }}
-        >
-          Don't have Phantom? <span style={{ color: '#ab9ff2' }}>Get it here →</span>
-        </a>
+          {error ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                background: '#fff5f6',
+                border: '1px solid #ffccd3',
+                marginBottom: '18px',
+              }}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#c8102e" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '1px' }}>
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v5M12 16.5v.5" />
+              </svg>
+              <span style={{ fontSize: '13.5px', lineHeight: 1.5, color: '#c8102e' }}>{error}</span>
+            </div>
+          ) : null}
+
+          <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#6a6a6a', marginBottom: '18px' }}>
+            {busy
+              ? 'Approve the request in the Phantom popup to finish signing in.'
+              : 'Connect your Phantom wallet to book stays, save wishlists and manage trips — no password required.'}
+          </p>
+
+          <button
+            type="button"
+            onClick={onConnect}
+            disabled={busy || done}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              padding: '15px 20px',
+              borderRadius: '10px',
+              border: 'none',
+              background: busy || done ? '#f0a8b6' : 'var(--rausch-grad)',
+              color: '#ffffff',
+              fontSize: '16px',
+              fontWeight: 700,
+              cursor: busy || done ? 'default' : 'pointer',
+            }}
+          >
+            {busy ? (
+              <span
+                style={{
+                  width: '17px',
+                  height: '17px',
+                  borderRadius: '999px',
+                  border: '2px solid rgba(255,255,255,0.5)',
+                  borderTopColor: '#ffffff',
+                  animation: 'spin 0.7s linear infinite',
+                }}
+              />
+            ) : (
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="6" width="20" height="13" rx="3" />
+                <path d="M2 10h20" />
+              </svg>
+            )}
+            {buttonLabel}
+          </button>
+
+          <a
+            href={PHANTOM_DOWNLOAD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'block',
+              textAlign: 'center',
+              marginTop: '16px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#6a6a6a',
+            }}
+          >
+            Don&apos;t have Phantom?{' '}
+            <span style={{ color: 'var(--rausch)', textDecoration: 'underline' }}>Get it here →</span>
+          </a>
+        </div>
       </div>
     </div>
   );
