@@ -1,26 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Figtree — a close, freely-licensed match for Airbnb Cereal. Self-hosted so
+   the preview needs zero external requests. Variable weight 300–900. */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('./assets/fonts/figtree-latin.woff2') format('woff2');
+}
+
 :root {
-  --bg: #0b0a0d;
-  --bg-elevated: #131218;
-  --card: #17161d;
-  --card-hover: #1e1c26;
-  --fg: #f6f4f2;
-  --muted: #a9a4b4;
-  --muted-strong: #cbc6d6;
-  --accent: #ff5a5f;
-  --accent-soft: #ff8a63;
-  --accent-deep: #c8375d;
-  --teal: #00a699;
-  --line: rgba(255, 255, 255, 0.09);
-  --line-strong: rgba(255, 255, 255, 0.16);
-  --radius: 18px;
-  --radius-lg: 26px;
-  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --bg: #ffffff;
+  --fg: #222222;
+  --muted: #6a6a6a;
+  --muted-strong: #484848;
+  --line: #dddddd;
+  --line-soft: #ebebeb;
+  --rausch: #ff385c;
+  --rausch-deep: #e61e4d;
+  --rausch-dark: #d70466;
+  --star: #222222;
+  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 * {
@@ -36,9 +39,12 @@ body {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 #root {
@@ -47,10 +53,11 @@ body {
 
 h1,
 h2,
-h3 {
-  font-family: 'Fraunces', Georgia, serif;
-  letter-spacing: -0.02em;
+h3,
+h4 {
   margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 p {
@@ -59,64 +66,48 @@ p {
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
 button {
   font-family: inherit;
+  cursor: pointer;
 }
 
 ::selection {
-  background: var(--accent);
-  color: #fff;
+  background: rgba(255, 56, 92, 0.18);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Horizontal carousel track — hide scrollbars but keep native scrolling */
+.hscroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hscroll::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes floatSlow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-14px); }
-}
-
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.7; }
+/* Hide the category tabs on small screens (matches Airbnb's mobile header). */
+@media (max-width: 743px) {
+  .nav-tabs {
+    display: none !important;
+  }
 }
 
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #0b0a0d;
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #2a2833;
+  background: #d2d2d2;
   border-radius: 8px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3746;
+  background: #b8b8b8;
 }
