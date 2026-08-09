@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SignInModal from './SignInModal';
-import { getPhantomProvider, shortenAddress } from '../lib/phantom';
+import { shortenAddress } from '../lib/phantom';
+import { usePhantom } from '../hooks/usePhantom';
 
 const navLinks = [
   { id: 'stays', label: 'Stays', href: '#stays' },
@@ -18,7 +19,8 @@ export default function Navbar() {
   const [accountHover, setAccountHover] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
-  const [account, setAccount] = useState<string | null>(null);
+
+  const { account, status, error, connect, disconnect, reset } = usePhantom();
 
   useEffect(() => {
     const onScroll = () => {
@@ -28,44 +30,24 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Restore a trusted Phantom session and keep the account in sync.
+  // Dismiss the modal shortly after a successful sign-in.
   useEffect(() => {
-    const provider = getPhantomProvider();
-    if (!provider) return;
-
-    provider
-      .connect({ onlyIfTrusted: true })
-      .then(({ publicKey }) => setAccount(publicKey.toString()))
-      .catch(() => {
-        /* Not previously authorized — user must sign in manually. */
-      });
-
-    const handleAccountChanged = (publicKey: unknown) => {
-      if (publicKey && typeof (publicKey as { toString?: unknown }).toString === 'function') {
-        setAccount((publicKey as { toString(): string }).toString());
-      } else {
-        setAccount(null);
-      }
-    };
-    const handleDisconnect = () => setAccount(null);
-
-    provider.on('accountChanged', handleAccountChanged);
-    provider.on('disconnect', handleDisconnect);
-
-    return () => {
-      provider.removeListener('accountChanged', handleAccountChanged);
-      provider.removeListener('disconnect', handleDisconnect);
-    };
-  }, []);
-
-  const handleDisconnect = async () => {
-    const provider = getPhantomProvider();
-    try {
-      await provider?.disconnect();
-    } catch {
-      /* ignore */
+    if (signInOpen && status === 'connected') {
+      const timer = window.setTimeout(() => setSignInOpen(false), 900);
+      return () => window.clearTimeout(timer);
     }
-    setAccount(null);
+  }, [signInOpen, status]);
+
+  // Kick off the Phantom connection directly from the click gesture so the
+  // wallet approval popup is allowed to open, and surface progress in the modal.
+  const handleSignIn = () => {
+    reset();
+    setSignInOpen(true);
+    void connect();
+  };
+
+  const handleDisconnect = () => {
+    void disconnect();
   };
 
   return (
@@ -254,7 +236,7 @@ export default function Navbar() {
           ) : (
             <button
               type="button"
-              onClick={() => setSignInOpen(true)}
+              onClick={handleSignIn}
               onMouseEnter={() => setSignInHover(true)}
               onMouseLeave={() => setSignInHover(false)}
               style={{
@@ -303,11 +285,11 @@ export default function Navbar() {
 
       <SignInModal
         open={signInOpen}
+        status={status}
+        error={error}
+        account={account}
         onClose={() => setSignInOpen(false)}
-        onSignedIn={(address) => {
-          setAccount(address);
-          setSignInOpen(false);
-        }}
+        onConnect={() => void connect()}
       />
 
       {menuOpen ? (

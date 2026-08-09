@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  getPhantomProvider,
-  shortenAddress,
-  PHANTOM_DOWNLOAD_URL,
-} from '../lib/phantom';
+import { shortenAddress, PHANTOM_DOWNLOAD_URL } from '../lib/phantom';
+import type { PhantomStatus } from '../hooks/usePhantom';
 
 interface SignInModalProps {
   open: boolean;
+  status: PhantomStatus;
+  error: string | null;
+  account: string | null;
   onClose: () => void;
-  onSignedIn: (address: string) => void;
+  /** Re-run the connect + sign flow (used by the retry / manual button). */
+  onConnect: () => void;
 }
 
-type Status = 'idle' | 'connecting' | 'signing' | 'done' | 'error';
-
-export default function SignInModal({ open, onClose, onSignedIn }: SignInModalProps) {
-  const [status, setStatus] = useState<Status>('idle');
-  const [error, setError] = useState<string | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
+export default function SignInModal({
+  open,
+  status,
+  error,
+  account,
+  onClose,
+  onConnect,
+}: SignInModalProps) {
   const [closeHover, setCloseHover] = useState(false);
   const [btnHover, setBtnHover] = useState(false);
 
@@ -38,67 +41,20 @@ export default function SignInModal({ open, onClose, onSignedIn }: SignInModalPr
     };
   }, [open, onClose]);
 
-  // Reset transient state each time the modal reopens.
-  useEffect(() => {
-    if (open) {
-      setStatus('idle');
-      setError(null);
-      setAddress(null);
-    }
-  }, [open]);
-
-  const handleConnect = async () => {
-    setError(null);
-    const provider = getPhantomProvider();
-
-    if (!provider) {
-      setStatus('error');
-      setError('Phantom wallet not found. Install the extension to continue.');
-      return;
-    }
-
-    try {
-      setStatus('connecting');
-      const { publicKey } = await provider.connect();
-      const walletAddress = publicKey.toString();
-      setAddress(walletAddress);
-
-      // Prove ownership by signing a human-readable sign-in message.
-      setStatus('signing');
-      const message =
-        `Sign in to Nomadly\n\n` +
-        `Wallet: ${walletAddress}\n` +
-        `Issued: ${new Date().toISOString()}\n\n` +
-        `Signing is free and will not trigger a blockchain transaction.`;
-      const encoded = new TextEncoder().encode(message);
-      await provider.signMessage(encoded, 'utf8');
-
-      setStatus('done');
-      // Briefly show the success state before the parent dismisses the modal.
-      window.setTimeout(() => onSignedIn(walletAddress), 900);
-    } catch (err) {
-      setStatus('error');
-      const code = (err as { code?: number })?.code;
-      if (code === 4001) {
-        setError('Request rejected. Approve the connection in Phantom to sign in.');
-      } else {
-        const message = err instanceof Error ? err.message : 'Could not connect to Phantom.';
-        setError(message);
-      }
-    }
-  };
-
   if (!open) return null;
 
   const busy = status === 'connecting' || status === 'signing';
+  const done = status === 'connected';
 
   const buttonLabel =
     status === 'connecting'
       ? 'Connecting…'
       : status === 'signing'
       ? 'Confirm in Phantom…'
-      : status === 'done'
+      : done
       ? 'Signed in'
+      : status === 'error'
+      ? 'Try again'
       : 'Connect Phantom';
 
   const overlay = (
@@ -203,11 +159,12 @@ export default function SignInModal({ open, onClose, onSignedIn }: SignInModalPr
             marginBottom: '24px',
           }}
         >
-          Connect your Phantom wallet to book stays, manage trips and get paid as a host — no
-          password required.
+          {busy
+            ? 'Approve the request in the Phantom popup to finish signing in.'
+            : 'Connect your Phantom wallet to book stays, manage trips and get paid as a host — no password required.'}
         </p>
 
-        {status === 'done' && address ? (
+        {done && account ? (
           <div
             style={{
               display: 'flex',
@@ -224,7 +181,7 @@ export default function SignInModal({ open, onClose, onSignedIn }: SignInModalPr
               <path d="M20 6L9 17l-5-5" />
             </svg>
             <span style={{ fontSize: '14px', fontWeight: 600, color: '#d9fff2' }}>
-              Connected as {shortenAddress(address)}
+              Connected as {shortenAddress(account)}
             </span>
           </div>
         ) : null}
@@ -252,8 +209,8 @@ export default function SignInModal({ open, onClose, onSignedIn }: SignInModalPr
 
         <button
           type="button"
-          onClick={handleConnect}
-          disabled={busy || status === 'done'}
+          onClick={onConnect}
+          disabled={busy || done}
           onMouseEnter={() => setBtnHover(true)}
           onMouseLeave={() => setBtnHover(false)}
           style={{
@@ -266,7 +223,7 @@ export default function SignInModal({ open, onClose, onSignedIn }: SignInModalPr
             borderRadius: '14px',
             border: 'none',
             background:
-              busy || status === 'done'
+              busy || done
                 ? 'rgba(124, 92, 255, 0.5)'
                 : btnHover
                 ? 'linear-gradient(135deg, #b6a9ff 0%, #8b6dff 100%)'
@@ -274,8 +231,8 @@ export default function SignInModal({ open, onClose, onSignedIn }: SignInModalPr
             color: '#ffffff',
             fontSize: '15.5px',
             fontWeight: 700,
-            cursor: busy || status === 'done' ? 'default' : 'pointer',
-            boxShadow: btnHover && !busy ? '0 14px 30px rgba(124, 92, 255, 0.4)' : 'none',
+            cursor: busy || done ? 'default' : 'pointer',
+            boxShadow: btnHover && !busy && !done ? '0 14px 30px rgba(124, 92, 255, 0.4)' : 'none',
             transition: 'all 0.22s ease',
           }}
         >
