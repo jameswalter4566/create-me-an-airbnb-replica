@@ -30,8 +30,8 @@ const stats = [
 const partners = ['Condé Nast', 'AFAR', 'Wanderlust', 'The Traveller', 'Roam Weekly'];
 
 export default function Stats() {
-  const [hoveredId, setHoveredId] = useState(null);
-  const [hoveredPartner, setHoveredPartner] = useState(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hoveredPartner, setHoveredPartner] = useState<string | null>(null);
 
   return (
     <section

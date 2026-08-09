@@ -34,7 +34,7 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
-  const [hoveredId, setHoveredId] = useState(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
     <section

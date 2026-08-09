@@ -18,7 +18,7 @@ export default function Hero() {
   const [primaryHover, setPrimaryHover] = useState(false);
   const [secondaryHover, setSecondaryHover] = useState(false);
   const [activeFilter, setActiveFilter] = useState('cabins');
-  const [hoveredFilter, setHoveredFilter] = useState(null);
+  const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
   const [cardHover, setCardHover] = useState(false);
 
   return (

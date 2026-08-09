@@ -9,7 +9,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [hoveredLink, setHoveredLink] = useState(null);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [ctaHover, setCtaHover] = useState(false);
   const [searchHover, setSearchHover] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

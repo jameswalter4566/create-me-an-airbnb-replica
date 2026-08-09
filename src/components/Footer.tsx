@@ -47,8 +47,8 @@ const socials = [
 ];
 
 export default function Footer() {
-  const [hoveredLink, setHoveredLink] = useState(null);
-  const [hoveredSocial, setHoveredSocial] = useState(null);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [hoveredSocial, setHoveredSocial] = useState<string | null>(null);
   const year = new Date().getFullYear();
 
   return (

@@ -29,7 +29,7 @@ const steps = [
 
 export default function HowItWorks() {
   const [activeStep, setActiveStep] = useState('step1');
-  const [hoveredStep, setHoveredStep] = useState(null);
+  const [hoveredStep, setHoveredStep] = useState<string | null>(null);
 
   return (
     <section

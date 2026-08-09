@@ -92,7 +92,7 @@ const features = [
 ];
 
 export default function Features() {
-  const [hoveredId, setHoveredId] = useState(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [tourHover, setTourHover] = useState(false);
 
   return (
