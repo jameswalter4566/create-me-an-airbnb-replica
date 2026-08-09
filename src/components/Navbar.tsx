@@ -13,7 +13,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [ctaHover, setCtaHover] = useState(false);
-  const [signInHover, setSignInHover] = useState(false);
   const [searchHover, setSearchHover] = useState(false);
   const [signInHover, setSignInHover] = useState(false);
   const [accountHover, setAccountHover] = useState(false);
@@ -274,33 +273,6 @@ export default function Navbar() {
               Sign in
             </button>
           )}
-
-          <button
-            type="button"
-            onMouseEnter={() => setSignInHover(true)}
-            onMouseLeave={() => setSignInHover(false)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 18px',
-              borderRadius: '999px',
-              border: '1px solid',
-              borderColor: signInHover ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.12)',
-              background: signInHover ? 'rgba(255,255,255,0.08)' : 'transparent',
-              color: signInHover ? '#ffffff' : '#e6e2ee',
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-3.6 3.6-6 8-6s8 2.4 8 6" />
-            </svg>
-            Sign in
-          </button>
 
           <button
             type="button"
