@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import SignInModal from './SignInModal';
+import { shortenAddress } from '../lib/phantom';
+import { usePhantom } from '../hooks/usePhantom';
 
 const navLinks = [
   { id: 'stays', label: 'Stays', href: '#stays' },
@@ -11,9 +14,13 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [ctaHover, setCtaHover] = useState(false);
-  const [signInHover, setSignInHover] = useState(false);
   const [searchHover, setSearchHover] = useState(false);
+  const [signInHover, setSignInHover] = useState(false);
+  const [accountHover, setAccountHover] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
+
+  const { account, status, error, connect, disconnect, reset } = usePhantom();
 
   useEffect(() => {
     const onScroll = () => {
@@ -22,6 +29,26 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Dismiss the modal shortly after a successful sign-in.
+  useEffect(() => {
+    if (signInOpen && status === 'connected') {
+      const timer = window.setTimeout(() => setSignInOpen(false), 900);
+      return () => window.clearTimeout(timer);
+    }
+  }, [signInOpen, status]);
+
+  // Kick off the Phantom connection directly from the click gesture so the
+  // wallet approval popup is allowed to open, and surface progress in the modal.
+  const handleSignIn = () => {
+    reset();
+    setSignInOpen(true);
+    void connect();
+  };
+
+  const handleDisconnect = () => {
+    void disconnect();
+  };
 
   return (
     <nav
@@ -172,32 +199,62 @@ export default function Navbar() {
             Anywhere
           </button>
 
-          <button
-            type="button"
-            onMouseEnter={() => setSignInHover(true)}
-            onMouseLeave={() => setSignInHover(false)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 18px',
-              borderRadius: '999px',
-              border: '1px solid',
-              borderColor: signInHover ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.12)',
-              background: signInHover ? 'rgba(255,255,255,0.08)' : 'transparent',
-              color: signInHover ? '#ffffff' : '#e6e2ee',
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-3.6 3.6-6 8-6s8 2.4 8 6" />
-            </svg>
-            Sign in
-          </button>
+          {account ? (
+            <button
+              type="button"
+              onClick={handleDisconnect}
+              onMouseEnter={() => setAccountHover(true)}
+              onMouseLeave={() => setAccountHover(false)}
+              title="Click to disconnect"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '9px',
+                padding: '9px 15px',
+                borderRadius: '999px',
+                border: '1px solid',
+                borderColor: accountHover ? 'rgba(124,92,255,0.6)' : 'rgba(124,92,255,0.35)',
+                background: accountHover ? 'rgba(124,92,255,0.16)' : 'rgba(124,92,255,0.08)',
+                color: '#e7e2ff',
+                fontSize: '13.5px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <span
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '999px',
+                  background: '#3ddc97',
+                  boxShadow: '0 0 8px rgba(61, 220, 151, 0.8)',
+                }}
+              />
+              {accountHover ? 'Disconnect' : shortenAddress(account)}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSignIn}
+              onMouseEnter={() => setSignInHover(true)}
+              onMouseLeave={() => setSignInHover(false)}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '999px',
+                border: '1px solid',
+                borderColor: signInHover ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.14)',
+                background: signInHover ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
+                color: '#f6f4f2',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Sign in
+            </button>
+          )}
 
           <button
             type="button"
@@ -225,6 +282,15 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+
+      <SignInModal
+        open={signInOpen}
+        status={status}
+        error={error}
+        account={account}
+        onClose={() => setSignInOpen(false)}
+        onConnect={() => void connect()}
+      />
 
       {menuOpen ? (
         <div
