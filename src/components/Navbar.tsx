@@ -9,6 +9,7 @@ import {
   UserIcon,
 } from './icons';
 import SearchBar from './SearchBar';
+import SignInButton from './SignInButton';
 
 const TABS = [
   { id: 'all', label: 'All', Icon: GlobeStandIcon },
@@ -138,6 +139,8 @@ export default function Navbar() {
             flex: '0 0 auto',
           }}
         >
+          <SignInButton />
+
           <a
             href="#host"
             onMouseEnter={() => setHostHover(true)}
